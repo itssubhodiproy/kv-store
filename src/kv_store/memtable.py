@@ -1,6 +1,4 @@
-import os
-
-from .wal import WAL
+TOMBSTONE = object()
 
 
 class Node:
@@ -12,29 +10,16 @@ class Node:
         self.height = 1
 
 
-TOMBSTONE = object()
-
-
 class MemTable:
     def __init__(self):
         self.root = None
-        self.wal = WAL()
         self.count = 0
-        self.max_entries = 10
-        self._recover()
-        self.sstable_id = self._next_sstable_id()
-
-    # -------------------------
-    # Public operations
-    # -------------------------
 
     def get(self, key):
         node = self.root
 
         while node:
             if key == node.key:
-                if node.value is TOMBSTONE:
-                    return None
                 return node.value
 
             if key < node.key:
@@ -45,54 +30,17 @@ class MemTable:
         return None
 
     def put(self, key, value):
-        self.wal.append("PUT", key, value)
         self.root = self._insert(self.root, key, value)
 
-        if self.count >= self.max_entries:
-            self.flush()
-
     def delete(self, key):
-        self.wal.append("DELETE", key)
         self.root = self._insert(self.root, key, TOMBSTONE)
 
-        if self.count >= self.max_entries:
-            self.flush()
+    def items(self):
+        yield from self._items(self.root)
 
-    # -------------------------
-    # Flush / Recovery
-    # -------------------------
-
-    def flush(self):
-        path = f"data/sstable-{self.sstable_id:04d}.txt"
-
-        with open(path, "w") as f:
-            for key, value in self._items(self.root):
-                if value is TOMBSTONE:
-                    value = "__TOMBSTONE__"
-
-                f.write(f"{key}:{value}\n")
-
-        self.wal.clear()
-
-        self.sstable_id += 1
+    def clear(self):
         self.root = None
         self.count = 0
-
-    def _recover(self):
-        for record in self.wal.replay():
-            if record["op"] == "PUT":
-                self.root = self._insert(
-                    self.root,
-                    record["key"],
-                    record["value"],
-                )
-
-            elif record["op"] == "DELETE":
-                self.root = self._insert(
-                    self.root,
-                    record["key"],
-                    TOMBSTONE,
-                )
 
     def _items(self, node):
         if not node:
@@ -101,14 +49,6 @@ class MemTable:
         yield from self._items(node.left)
         yield node.key, node.value
         yield from self._items(node.right)
-
-    def _next_sstable_id(self):
-        i = 1
-
-        while os.path.exists(f"data/sstable-{i:04d}.txt"):
-            i += 1
-
-        return i
 
     # -------------------------
     # AVL Tree

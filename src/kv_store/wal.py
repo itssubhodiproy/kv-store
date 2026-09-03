@@ -6,9 +6,6 @@ class WAL:
     def __init__(self, path="data/wal.log"):
         self.path = path
         os.makedirs("data", exist_ok=True)
-    
-    def clear(self):
-        open(self.path, "w").close()
 
     def append(self, op, key, value=None):
         record = {
@@ -33,3 +30,6 @@ class WAL:
                 records.append(json.loads(line))
 
         return records
+
+    def clear(self):
+        open(self.path, "w").close()
