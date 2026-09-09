@@ -5,9 +5,12 @@ from .memtable import TOMBSTONE
 
 
 class SSTable:
-    def __init__(self, max_entries=20, max_blocks=4):
+    def __init__(self, data_dir="data", max_entries=20, max_blocks=4):
+        self.data_dir = data_dir
         self.max_entries = max_entries
         self.max_blocks = max_blocks
+
+        os.makedirs(self.data_dir, exist_ok=True)
 
         self.next_id = self._next_sstable_id()
         self.metadata = self._load_metadata()
@@ -19,9 +22,18 @@ class SSTable:
     def flush(self, items):
         sstable_id = self.next_id
 
-        path = f"data/sstable-{sstable_id:04d}.txt"
-        index_path = f"data/sstable-{sstable_id:04d}.index"
-        bloom_path = f"data/sstable-{sstable_id:04d}.bloom"
+        path = os.path.join(
+            self.data_dir,
+            f"sstable-{sstable_id:04d}.txt",
+        )
+        index_path = os.path.join(
+            self.data_dir,
+            f"sstable-{sstable_id:04d}.index",
+        )
+        bloom_path = os.path.join(
+            self.data_dir,
+            f"sstable-{sstable_id:04d}.bloom",
+        )
 
         index_entries = []
         block_size = self.max_entries // self.max_blocks

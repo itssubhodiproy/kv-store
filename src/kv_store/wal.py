@@ -3,9 +3,12 @@ import os
 
 
 class WAL:
-    def __init__(self, path="data/wal.log"):
-        self.path = path
-        os.makedirs("data", exist_ok=True)
+    def __init__(self, data_dir="data"):
+        os.makedirs(data_dir, exist_ok=True)
+        self.path = os.path.join(
+            data_dir,
+            "wal.log",
+        )
 
     def append(self, op, key, value=None):
         record = {

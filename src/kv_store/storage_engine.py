@@ -4,12 +4,13 @@ from .wal import WAL
 
 
 class StorageEngine:
-    def __init__(self):
+    def __init__(self, data_dir="data"):
         self.max_entries = 20
 
         self.memtable = MemTable()
-        self.wal = WAL()
+        self.wal = WAL(data_dir=data_dir)
         self.sstable = SSTable(
+            data_dir=data_dir,
             max_entries=self.max_entries,
             max_blocks=4,
         )

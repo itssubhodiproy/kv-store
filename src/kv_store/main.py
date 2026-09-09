@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 import grpc
 
@@ -8,7 +9,10 @@ from .storage_engine import StorageEngine
 
 
 async def serve():
-    engine = StorageEngine()
+    port = os.getenv("PORT", "50051")
+    data_dir = os.getenv("DATA_DIR", "data")
+
+    engine = StorageEngine(data_dir=data_dir)
     server = grpc.aio.server()
 
     storage_pb2_grpc.add_StorageServicer_to_server(
@@ -16,10 +20,10 @@ async def serve():
         server,
     )
 
-    server.add_insecure_port("[::]:50051")
+    server.add_insecure_port(f"[::]:{port}")
 
     await server.start()
-    print("Storage node listening on :50051")
+    print(f"Storage node listening on :{port}")
 
     await server.wait_for_termination()
 
