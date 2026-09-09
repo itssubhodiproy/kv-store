@@ -7,10 +7,13 @@ authors = [
     { name = "itssubhodiproy", email = "subhodiproy281@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "grpcio>=1.83.1",
+    "grpcio-tools>=1.83.1",
+]
 
 [project.scripts]
-kv-store = "kv_store:main"
+kv-store = "kv_store.main:main"
 
 [build-system]
 requires = ["uv_build>=0.12.6,<0.13.0"]
