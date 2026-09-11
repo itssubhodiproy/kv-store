@@ -6,13 +6,16 @@ services:
       - --name=etcd
       - --advertise-client-urls=http://etcd:2379
       - --listen-client-urls=http://0.0.0.0:2379
+      - --data-dir=/etcd-data       
     ports:
       - "2379:2379"
     volumes:
       - etcd-data:/etcd-data
 
   storage-1:
-    build: .
+    build:
+      context: .
+      dockerfile: services/storage/Dockerfile
     environment:
       PORT: "50051"
       DATA_DIR: /data
@@ -26,7 +29,9 @@ services:
       - storage-1-data:/data
 
   storage-2:
-    build: .
+    build:
+      context: .
+      dockerfile: services/storage/Dockerfile
     environment:
       PORT: "50051"
       DATA_DIR: /data
@@ -38,6 +43,15 @@ services:
       - "50052:50051"
     volumes:
       - storage-2-data:/data
+
+  proxy:
+    build:
+      context: .
+      dockerfile: services/proxy/Dockerfile
+    environment:
+      ETCD_ENDPOINT: http://etcd:2379
+    depends_on:
+      - etcd
 
 volumes:
   etcd-data:
