@@ -9,8 +9,11 @@ async def serve():
     registry = NodeRegistry(etcd_endpoint)
 
     try:
-        nodes = await registry.get_nodes()
-        print(f"Discovered nodes; {nodes}")
+        nodes, revision = await registry.load_nodes()
+        print(f"Discovered nodes: {nodes} and revision: {revision}")
+
+        await registry.watch_nodes(revision + 1)
+
     finally:
         await registry.close()
 
