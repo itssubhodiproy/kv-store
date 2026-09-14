@@ -125,6 +125,12 @@ wheels = [
 name = "kv-store-proxy"
 version = "0.1.0"
 source = { editable = "services/proxy" }
+dependencies = [
+    { name = "httpx" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "httpx", specifier = ">=0.28.1" }]
 
 [[package]]
 name = "kv-store-storage"

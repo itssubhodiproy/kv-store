@@ -2,7 +2,9 @@
 name = "kv-store-proxy"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+]
 
 [project.scripts]
 proxy-node = "kv_store_proxy.main:main"
