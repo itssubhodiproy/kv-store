@@ -1,19 +1,31 @@
 import asyncio
 import os
 
+from .hash_ring import HashRing
 from .registry import NodeRegistry
 
 
 async def serve():
     etcd_endpoint = os.getenv("ETCD_ENDPOINT", "http://localhost:2379")
     registry = NodeRegistry(etcd_endpoint)
+    ring = HashRing()
 
     try:
         nodes, revision = await registry.load_nodes()
-        print(f"Discovered nodes: {nodes} and revision: {revision}")
 
-        await registry.watch_nodes(revision + 1)
+        for node_id in nodes:
+            ring.add_node(node_id)
 
+        print(f"Discovered nodes: {nodes}")
+
+        async for event_type, node_id in registry.watch_nodes(revision + 1):
+            if event_type == "PUT":
+                ring.add_node(node_id)
+            else:
+                ring.remove_node(node_id)
+
+            print(f"{event_type} {node_id}")
+    
     finally:
         await registry.close()
 

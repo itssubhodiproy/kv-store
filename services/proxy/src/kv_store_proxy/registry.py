@@ -67,11 +67,11 @@ class NodeRegistry:
 
                     if event_type == "DELETE":
                         self.nodes.pop(node_id, None)
-                        print(f"DELETE {node_id}")
+                        yield "DELETE", node_id
                     else:
                         address = self._decode(kv["value"])
                         self.nodes[node_id] = address
-                        print(f"PUT {node_id} -> {address}")
+                        yield "PUT", node_id
 
     async def close(self):
         await self.client.aclose()
