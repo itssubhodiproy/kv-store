@@ -1,22 +1,60 @@
 # KV Store
 
-A distributed key-value store built from scratch for learning how storage engines and distributed databases work internally.
+Distributed key-value store built from scratch to learn storage engines and distributed systems internals.
 
-Currently implements a single-node LSM-style storage engine with:
+## Architecture
 
-* AVL tree-based MemTable
-* Write-ahead log (WAL) with recovery
-* Immutable SSTables
-* Bloom filters
-* Sparse indexes
-* Disk-based reads
+```text
+Client
+  │ HTTP
+  ▼
+Proxy
+  ├─ etcd service discovery + watch
+  ├─ consistent hashing + virtual nodes
+  └─ persistent gRPC channels
+        │
+        ▼
+   Storage Nodes
+        │
+        ├─ WAL
+        ├─ AVL MemTable
+        └─ SSTables
+            ├─ Bloom filters
+            └─ sparse indexes
+```
+
+The proxy maintains live node membership from etcd, routes keys using consistent hashing, then forwards GET/PUT/DELETE to the owning storage node over gRPC.
+
+Each storage node runs an LSM-style engine:
+
+```text
+Write: WAL → MemTable → SSTable flush
+Read:  MemTable → newest SSTable → Bloom filter → sparse index → disk
+```
+
+## Implemented
+
+* HTTP GET / PUT / DELETE API
+* gRPC proxy → storage communication
+* consistent hashing with virtual nodes
+* etcd node discovery, leases + live membership watch
+* persistent gRPC channels per storage node
+* WAL + crash recovery
+* AVL-tree MemTable + tombstones
+* immutable numbered SSTables
+* Bloom filters + sparse indexes
+* Dockerized multi-node local cluster
 
 ## Run
 
 ```bash
-uv run kv-store
+docker compose up --build
 ```
+
+Proxy runs on `localhost:8000`.
 
 ## Status
 
-Work in progress. Currently focused on the single-node storage engine. Distributed routing, replication, and coordination will be added later.
+Working distributed routing + single-node durable storage.
+
+Next: replication, consistency/quorums, failure handling, and rebalancing.
