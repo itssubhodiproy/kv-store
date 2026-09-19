@@ -6,7 +6,7 @@ services:
       - --name=etcd
       - --advertise-client-urls=http://etcd:2379
       - --listen-client-urls=http://0.0.0.0:2379
-      - --data-dir=/etcd-data       
+      - --data-dir=/etcd-data
     ports:
       - "2379:2379"
     volumes:
@@ -52,6 +52,8 @@ services:
       ETCD_ENDPOINT: http://etcd:2379
     depends_on:
       - etcd
+    ports:
+      - "8000:8000"
 
 volumes:
   etcd-data:
