@@ -20,13 +20,19 @@ async def watch_nodes(registry, ring, revision):
 
 
 async def serve():
+    REPLICATION_FACTOR = 3
+    READ_QUORUM = 2
+    WRITE_QUORUM = 2
+
     registry = NodeRegistry(os.getenv("ETCD_ENDPOINT", "http://localhost:2379"))
-    ring = HashRing()
+    ring = HashRing(virtual_nodes=100, replication_factor=REPLICATION_FACTOR)
     storage_client = StorageClient()
 
     app.state.registry = registry
     app.state.ring = ring
     app.state.storage_client = storage_client
+    app.state.read_quorum = READ_QUORUM
+    app.state.write_quorum = WRITE_QUORUM
 
     try:
         nodes, revision = await registry.load_nodes()
