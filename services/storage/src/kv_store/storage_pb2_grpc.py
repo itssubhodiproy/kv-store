@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from kv_store import storage_pb2 as kv__store_dot_storage__pb2
+from . import storage_pb2 as storage__pb2
 
 GRPC_GENERATED_VERSION = '1.83.1'
 GRPC_VERSION = grpc.__version__
