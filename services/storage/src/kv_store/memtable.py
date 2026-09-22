@@ -2,9 +2,11 @@ TOMBSTONE = object()
 
 
 class Node:
-    def __init__(self, key, value):
+    def __init__(self, key, value, version):
         self.key = key
         self.value = value
+        self.version = version
+
         self.left = None
         self.right = None
         self.height = 1
@@ -20,8 +22,7 @@ class MemTable:
 
         while node:
             if key == node.key:
-                return node.value
-
+                return node.value, node.version
             if key < node.key:
                 node = node.left
             else:
@@ -29,11 +30,11 @@ class MemTable:
 
         return None
 
-    def put(self, key, value):
-        self.root = self._insert(self.root, key, value)
+    def put(self, key, value, version):
+        self.root = self._insert(self.root, key, value, version)
 
-    def delete(self, key):
-        self.root = self._insert(self.root, key, TOMBSTONE)
+    def delete(self, key, version):
+        self.root = self._insert(self.root, key, TOMBSTONE, version)
 
     def items(self):
         yield from self._items(self.root)
@@ -47,24 +48,25 @@ class MemTable:
             return
 
         yield from self._items(node.left)
-        yield node.key, node.value
+        yield node.key, node.value, node.version
         yield from self._items(node.right)
 
     # -------------------------
     # AVL Tree
     # -------------------------
 
-    def _insert(self, node, key, value):
+    def _insert(self, node, key, value, version):
         if not node:
             self.count += 1
-            return Node(key, value)
+            return Node(key, value, version)
 
         if key < node.key:
-            node.left = self._insert(node.left, key, value)
+            node.left = self._insert(node.left, key, value, version)
         elif key > node.key:
-            node.right = self._insert(node.right, key, value)
+            node.right = self._insert(node.right, key, value, version)
         else:
             node.value = value
+            node.version = version
             return node
 
         node.height = 1 + max(

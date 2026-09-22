@@ -40,7 +40,7 @@ class SSTable:
         bloom = [0] * 64
 
         with open(path, "w") as f, open(index_path, "w") as index:
-            for i, (key, value) in enumerate(items):
+            for i, (key, value, version) in enumerate(items):
                 if value is TOMBSTONE:
                     value = "__TOMBSTONE__"
 
@@ -51,7 +51,7 @@ class SSTable:
                     index.write(f"{key}:{offset}\n")
                     index_entries.append((key, offset))
 
-                f.write(f"{key}:{value}\n")
+                f.write(f"{key}:{value}:{version}\n")
 
         with open(bloom_path, "w") as f:
             f.write("".join(map(str, bloom)))
@@ -68,13 +68,17 @@ class SSTable:
             if not self._check_bloom(sstable_id, key):
                 continue
 
-            value = self._search(sstable_id, key)
+            result = self._search(sstable_id, key)
+
+            if result is None:
+                continue
+
+            value, version = result
 
             if value == "__TOMBSTONE__":
-                return TOMBSTONE
+                return TOMBSTONE, version
 
-            if value is not None:
-                return value
+            return value, version
 
         return None
 
@@ -83,7 +87,10 @@ class SSTable:
     # -------------------------
 
     def _search(self, sstable_id, key):
-        data_path = f"data/sstable-{sstable_id:04d}.txt"
+        data_path = os.path.join(
+            self.data_dir,
+            f"sstable-{sstable_id:04d}.txt",
+        )
 
         index = self.metadata[sstable_id]["index"]
 
@@ -118,10 +125,10 @@ class SSTable:
 
         # Small block, linear scan
         for line in data.splitlines():
-            stored_key, value = line.split(":", 1)
+            stored_key, value, version = line.split(":", 2)
 
             if stored_key == key:
-                return value
+                return value, int(version)
 
         return None
 
@@ -159,8 +166,15 @@ class SSTable:
         metadata = {}
 
         for sstable_id in range(1, self.next_id):
-            index_path = f"data/sstable-{sstable_id:04d}.index"
-            bloom_path = f"data/sstable-{sstable_id:04d}.bloom"
+            index_path = os.path.join(
+                self.data_dir,
+                f"sstable-{sstable_id:04d}.index",
+            )
+
+            bloom_path = os.path.join(
+                self.data_dir,
+                f"sstable-{sstable_id:04d}.bloom",
+            )
 
             index = []
 
@@ -182,7 +196,7 @@ class SSTable:
     def _next_sstable_id(self):
         i = 1
 
-        while os.path.exists(f"data/sstable-{i:04d}.txt"):
+        while os.path.exists(os.path.join(self.data_dir, f"sstable-{i:04d}.txt")):
             i += 1
 
         return i

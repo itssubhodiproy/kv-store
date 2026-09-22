@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 import grpc
 from fastapi import FastAPI, HTTPException, Request
@@ -88,17 +89,24 @@ async def get(key: str, req: Request):
 
     responses = await wait_for_read_quorum(calls, read_quorum)
 
-    # Temporary until version reconciliation is implemented.
-    # TODO: reconcile replica responses using version metadata.
-    response = next(
-        (response for response in responses if response.found),
-        None,
-    )
+    found_responses = [
+        response
+        for response in responses
+        if response.found
+    ]
 
-    if response is None:
+    if not found_responses:
         raise HTTPException(status_code=404, detail="Key not found")
 
-    return {"value": response.value}
+    latest = max(
+        found_responses,
+        key=lambda response: response.version,
+    )
+
+    if latest.deleted:
+        raise HTTPException(status_code=404, detail="Key not found")
+
+    return {"value": latest.value}
 
 
 @app.put("/kv/{key}")
@@ -112,13 +120,10 @@ async def put(key: str, body: PutBody, req: Request):
             detail="Not enough replicas for write quorum",
         )
 
+    version = time.time_ns()
+
     calls = [
-        stub.Put(
-            storage_pb2.PutRequest(
-                key=key,
-                value=body.value,
-            )
-        )
+        stub.Put(storage_pb2.PutRequest(key=key, value=body.value, version=version))
         for stub in stubs
     ]
 
@@ -138,7 +143,12 @@ async def delete(key: str, req: Request):
             detail="Not enough replicas for write quorum",
         )
 
-    calls = [stub.Delete(storage_pb2.DeleteRequest(key=key)) for stub in stubs]
+    version = time.time_ns()
+
+    calls = [
+        stub.Delete(storage_pb2.DeleteRequest(key=key, version=version))
+        for stub in stubs
+    ]
 
     await wait_for_write_quorum(calls, write_quorum)
 

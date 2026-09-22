@@ -1,4 +1,4 @@
-from .memtable import TOMBSTONE, MemTable
+from .memtable import MemTable
 from .sstable import SSTable
 from .wal import WAL
 
@@ -18,31 +18,23 @@ class StorageEngine:
         self._recover()
 
     def get(self, key):
-        value = self.memtable.get(key)
+        result = self.memtable.get(key)
 
-        if value is TOMBSTONE:
-            return None
+        if result is not None:
+            return result
 
-        if value is not None:
-            return value
+        return self.sstable.get(key)
 
-        value = self.sstable.get(key)
-
-        if value is TOMBSTONE:
-            return None
-
-        return value
-
-    def put(self, key, value):
-        self.wal.append("PUT", key, value)
-        self.memtable.put(key, value)
+    def put(self, key, value, version):
+        self.wal.append("PUT", key, version, value)
+        self.memtable.put(key, value, version)
 
         if self.memtable.count >= self.max_entries:
             self._flush()
 
-    def delete(self, key):
-        self.wal.append("DELETE", key)
-        self.memtable.delete(key)
+    def delete(self, key, version):
+        self.wal.append("DELETE", key, version=version)
+        self.memtable.delete(key, version)
 
         if self.memtable.count >= self.max_entries:
             self._flush()
@@ -56,10 +48,7 @@ class StorageEngine:
     def _recover(self):
         for record in self.wal.replay():
             if record["op"] == "PUT":
-                self.memtable.put(
-                    record["key"],
-                    record["value"],
-                )
+                self.memtable.put(record["key"], record["value"], record["version"])
 
             elif record["op"] == "DELETE":
-                self.memtable.delete(record["key"])
+                self.memtable.delete(record["key"], record["version"])

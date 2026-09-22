@@ -15,17 +15,21 @@ message GetRequest {
 message GetResponse {
   bool found = 1;
   string value = 2;
+  uint64 version = 3;
+  bool deleted = 4;
 }
 
 message PutRequest {
   string key = 1;
   string value = 2;
+  uint64 version = 3;
 }
 
 message PutResponse {}
 
 message DeleteRequest {
   string key = 1;
+  uint64 version = 2;
 }
 
 message DeleteResponse {}

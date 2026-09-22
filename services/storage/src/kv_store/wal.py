@@ -10,12 +10,8 @@ class WAL:
             "wal.log",
         )
 
-    def append(self, op, key, value=None):
-        record = {
-            "op": op,
-            "key": key,
-            "value": value,
-        }
+    def append(self, op, key, version, value=None):
+        record = {"op": op, "key": key, "value": value, "version": version}
 
         with open(self.path, "a") as f:
             f.write(json.dumps(record) + "\n")

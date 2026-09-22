@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in kv_store/storage_pb2_grpc.py depends on'
+        + ' but the generated code in storage_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,18 +36,18 @@ class StorageStub:
         """
         self.Get = channel.unary_unary(
                 '/kv.Storage/Get',
-                request_serializer=kv__store_dot_storage__pb2.GetRequest.SerializeToString,
-                response_deserializer=kv__store_dot_storage__pb2.GetResponse.FromString,
+                request_serializer=storage__pb2.GetRequest.SerializeToString,
+                response_deserializer=storage__pb2.GetResponse.FromString,
                 _registered_method=True)
         self.Put = channel.unary_unary(
                 '/kv.Storage/Put',
-                request_serializer=kv__store_dot_storage__pb2.PutRequest.SerializeToString,
-                response_deserializer=kv__store_dot_storage__pb2.PutResponse.FromString,
+                request_serializer=storage__pb2.PutRequest.SerializeToString,
+                response_deserializer=storage__pb2.PutResponse.FromString,
                 _registered_method=True)
         self.Delete = channel.unary_unary(
                 '/kv.Storage/Delete',
-                request_serializer=kv__store_dot_storage__pb2.DeleteRequest.SerializeToString,
-                response_deserializer=kv__store_dot_storage__pb2.DeleteResponse.FromString,
+                request_serializer=storage__pb2.DeleteRequest.SerializeToString,
+                response_deserializer=storage__pb2.DeleteResponse.FromString,
                 _registered_method=True)
 
 
@@ -77,18 +77,18 @@ def add_StorageServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Get': grpc.unary_unary_rpc_method_handler(
                     servicer.Get,
-                    request_deserializer=kv__store_dot_storage__pb2.GetRequest.FromString,
-                    response_serializer=kv__store_dot_storage__pb2.GetResponse.SerializeToString,
+                    request_deserializer=storage__pb2.GetRequest.FromString,
+                    response_serializer=storage__pb2.GetResponse.SerializeToString,
             ),
             'Put': grpc.unary_unary_rpc_method_handler(
                     servicer.Put,
-                    request_deserializer=kv__store_dot_storage__pb2.PutRequest.FromString,
-                    response_serializer=kv__store_dot_storage__pb2.PutResponse.SerializeToString,
+                    request_deserializer=storage__pb2.PutRequest.FromString,
+                    response_serializer=storage__pb2.PutResponse.SerializeToString,
             ),
             'Delete': grpc.unary_unary_rpc_method_handler(
                     servicer.Delete,
-                    request_deserializer=kv__store_dot_storage__pb2.DeleteRequest.FromString,
-                    response_serializer=kv__store_dot_storage__pb2.DeleteResponse.SerializeToString,
+                    request_deserializer=storage__pb2.DeleteRequest.FromString,
+                    response_serializer=storage__pb2.DeleteResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -116,8 +116,8 @@ class Storage:
             request,
             target,
             '/kv.Storage/Get',
-            kv__store_dot_storage__pb2.GetRequest.SerializeToString,
-            kv__store_dot_storage__pb2.GetResponse.FromString,
+            storage__pb2.GetRequest.SerializeToString,
+            storage__pb2.GetResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -143,8 +143,8 @@ class Storage:
             request,
             target,
             '/kv.Storage/Put',
-            kv__store_dot_storage__pb2.PutRequest.SerializeToString,
-            kv__store_dot_storage__pb2.PutResponse.FromString,
+            storage__pb2.PutRequest.SerializeToString,
+            storage__pb2.PutResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -170,8 +170,8 @@ class Storage:
             request,
             target,
             '/kv.Storage/Delete',
-            kv__store_dot_storage__pb2.DeleteRequest.SerializeToString,
-            kv__store_dot_storage__pb2.DeleteResponse.FromString,
+            storage__pb2.DeleteRequest.SerializeToString,
+            storage__pb2.DeleteResponse.FromString,
             options,
             channel_credentials,
             insecure,

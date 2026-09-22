@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rstorage.proto\x12\x02kv\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"+\n\x0bGetResponse\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\t\"(\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"\r\n\x0bPutResponse\"\x1c\n\rDeleteRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"\x10\n\x0e\x44\x65leteResponse2\x8a\x01\n\x07Storage\x12&\n\x03Get\x12\x0e.kv.GetRequest\x1a\x0f.kv.GetResponse\x12&\n\x03Put\x12\x0e.kv.PutRequest\x1a\x0f.kv.PutResponse\x12/\n\x06\x44\x65lete\x12\x11.kv.DeleteRequest\x1a\x12.kv.DeleteResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rstorage.proto\x12\x02kv\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\"M\n\x0bGetResponse\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\t\x12\x0f\n\x07version\x18\x03 \x01(\x04\x12\x0f\n\x07\x64\x65leted\x18\x04 \x01(\x08\"9\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x0f\n\x07version\x18\x03 \x01(\x04\"\r\n\x0bPutResponse\"-\n\rDeleteRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\x04\"\x10\n\x0e\x44\x65leteResponse2\x8a\x01\n\x07Storage\x12&\n\x03Get\x12\x0e.kv.GetRequest\x1a\x0f.kv.GetResponse\x12&\n\x03Put\x12\x0e.kv.PutRequest\x1a\x0f.kv.PutResponse\x12/\n\x06\x44\x65lete\x12\x11.kv.DeleteRequest\x1a\x12.kv.DeleteResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,15 +34,15 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_GETREQUEST']._serialized_start=21
   _globals['_GETREQUEST']._serialized_end=46
   _globals['_GETRESPONSE']._serialized_start=48
-  _globals['_GETRESPONSE']._serialized_end=91
-  _globals['_PUTREQUEST']._serialized_start=93
-  _globals['_PUTREQUEST']._serialized_end=133
-  _globals['_PUTRESPONSE']._serialized_start=135
-  _globals['_PUTRESPONSE']._serialized_end=148
-  _globals['_DELETEREQUEST']._serialized_start=150
-  _globals['_DELETEREQUEST']._serialized_end=178
-  _globals['_DELETERESPONSE']._serialized_start=180
-  _globals['_DELETERESPONSE']._serialized_end=196
-  _globals['_STORAGE']._serialized_start=199
-  _globals['_STORAGE']._serialized_end=337
+  _globals['_GETRESPONSE']._serialized_end=125
+  _globals['_PUTREQUEST']._serialized_start=127
+  _globals['_PUTREQUEST']._serialized_end=184
+  _globals['_PUTRESPONSE']._serialized_start=186
+  _globals['_PUTRESPONSE']._serialized_end=199
+  _globals['_DELETEREQUEST']._serialized_start=201
+  _globals['_DELETEREQUEST']._serialized_end=246
+  _globals['_DELETERESPONSE']._serialized_start=248
+  _globals['_DELETERESPONSE']._serialized_end=264
+  _globals['_STORAGE']._serialized_start=267
+  _globals['_STORAGE']._serialized_end=405
 # @@protoc_insertion_point(module_scope)
